@@ -1,7 +1,5 @@
 package GameOfLifeCompute.rendering;
 
-import lifeGaming.rendering.Program;
-import lifeGaming.rendering.Texture;
 import org.lwjgl.opengl.GL46;
 import org.lwjgl.system.MemoryUtil;
 

@@ -1,7 +1,5 @@
 package GameOfLifeCompute.main;
 
-import lifeGaming.main.Preset;
-
 public class Presets {
 
 	public Preset glider=new Preset(3,3,new float[]{

@@ -1,17 +1,15 @@
 package GameOfLifeCompute.main;
 
-import lifeGaming.main.Presets;
-import lifeGaming.main.Window;
+import GameOfLifeCompute.rendering.Mesh;
+import GameOfLifeCompute.rendering.Program;
+import GameOfLifeCompute.rendering.Shader;
+import GameOfLifeCompute.rendering.Texture;
+import GameOfLifeCompute.utils.FileHandling;
+import GameOfLifeCompute.utils.Timer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL46;
 
 import GameOfLifeCompute.Input;
-import lifeGaming.rendering.Mesh;
-import lifeGaming.rendering.Program;
-import lifeGaming.rendering.Shader;
-import lifeGaming.rendering.Texture;
-import lifeGaming.utils.FileHandling;
-import lifeGaming.utils.Timer;
 
 public class Main {
 	
@@ -169,7 +167,6 @@ public class Main {
 		renderTexture0=!renderTexture0;
 		if(input.isKeyDownThisUpdate(GLFW.GLFW_KEY_SPACE)) {
 			paused=!paused;
-		}else if(!input.isKeyDown(GLFW.GLFW_KEY_SPACE)) {
 		}
 		
 		input.updateInputs();

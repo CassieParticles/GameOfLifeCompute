@@ -1,8 +1,8 @@
 package GameOfLifeCompute;
 
+import GameOfLifeCompute.main.Window;
 import org.lwjgl.glfw.GLFW;
 
-import lifeGaming.main.Window;
 
 
 public class Input {
