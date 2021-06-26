@@ -3,8 +3,6 @@ package GameOfLifeCompute;
 import GameOfLifeCompute.main.Window;
 import org.lwjgl.glfw.GLFW;
 
-
-
 public class Input {
     private boolean[] keys=new boolean[GLFW.GLFW_KEY_LAST];
     private boolean[] keysAllreadyPressed=new boolean[GLFW.GLFW_KEY_LAST];
@@ -41,7 +39,7 @@ public class Input {
         return keys[key];
     }	
     
-    public boolean isKeyDownThisUpdate(int key){
+    public boolean isKeyPressed(int key){
     	return keys[key]&&!keysAllreadyPressed[key];
     }
     

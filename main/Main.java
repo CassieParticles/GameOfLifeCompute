@@ -28,7 +28,7 @@ public class Main {
 	private Texture texture0;
 	private Texture texture1;
 
-	private int screenSize=512;
+	private int screenSize=1024;
 	private int pixelsPerSquare=4;
 	private int textureSize;
 
@@ -91,12 +91,12 @@ public class Main {
 		
 		
 		screenProgram.attachShaders(new Shader[]{
-				new Shader(FileHandling.loadResource("src/lifeGaming/rendering/screenGLSL/vertex.glsl"),GL46.GL_VERTEX_SHADER),
-				new Shader(FileHandling.loadResource("src/lifeGaming/rendering/screenGLSL/fragment.glsl"),GL46.GL_FRAGMENT_SHADER)
+				new Shader(FileHandling.loadResource("src/GameOfLifeCompute/rendering/screenGLSL/vertex.glsl"),GL46.GL_VERTEX_SHADER),
+				new Shader(FileHandling.loadResource("src/GameOfLifeCompute/rendering/screenGLSL/fragment.glsl"),GL46.GL_FRAGMENT_SHADER)
 		});
 		
 		computeProgram.attachShaders(new Shader[] {
-				new Shader(FileHandling.loadResource("src/lifeGaming/main/gameOfLife.glsl"),GL46.GL_COMPUTE_SHADER)
+				new Shader(FileHandling.loadResource("src/GameOfLifeCompute/main/gameOfLife.glsl"),GL46.GL_COMPUTE_SHADER)
 		});
 		
 		screenProgram.link();
@@ -158,14 +158,14 @@ public class Main {
 			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare),1,1,new float[]{1});
 		}else if(input.isMouseButtonDown(GLFW.GLFW_MOUSE_BUTTON_RIGHT)) {
 			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare),1,1,new float[]{0});
-		}else if(input.isKeyDownThisUpdate(GLFW.GLFW_KEY_1)){
+		}else if(input.isKeyPressed(GLFW.GLFW_KEY_1)){
 			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare), presets.glider);
-		}else if(input.isKeyDownThisUpdate(GLFW.GLFW_KEY_2)){
+		}else if(input.isKeyPressed(GLFW.GLFW_KEY_2)){
 			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare), presets.gosperGun);
 		}
 
 		renderTexture0=!renderTexture0;
-		if(input.isKeyDownThisUpdate(GLFW.GLFW_KEY_SPACE)) {
+		if(input.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
 			paused=!paused;
 		}
 		
