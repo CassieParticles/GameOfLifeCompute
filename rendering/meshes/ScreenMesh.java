@@ -1,12 +1,14 @@
-package GameOfLifeCompute.rendering;
+package GameOfLifeCompute.rendering.meshes;
 
+import GameOfLifeCompute.rendering.Program;
+import GameOfLifeCompute.rendering.Texture;
 import org.lwjgl.opengl.GL46;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class Mesh {
+public class ScreenMesh {
 
     private int vaoId;
     private int vertexVboId;
@@ -16,7 +18,7 @@ public class Mesh {
 
     private int vertexCount;
 
-    public Mesh(float[] vertices, int[] indices, float[] textureCoords, float[] colours){
+    public ScreenMesh(float[] vertices, int[] indices, float[] textureCoords, float[] colours){
         vertexCount=indices.length;
 
         FloatBuffer verticesBuffer=null;
@@ -74,11 +76,11 @@ public class Mesh {
     }
     
     
-    public void render(Program program, Texture[] textures, int textureToUse){
+    public void render(Program program, Texture texture){
     	program.useProgram();
 
         GL46.glActiveTexture(GL46.GL_TEXTURE0);
-        GL46.glBindTexture(GL46.GL_TEXTURE_2D,textures[textureToUse].getId());
+        GL46.glBindTexture(GL46.GL_TEXTURE_2D,texture.getId());
     	
     	GL46.glBindVertexArray(getVaoId());
     	 
