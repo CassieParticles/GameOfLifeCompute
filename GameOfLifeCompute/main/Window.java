@@ -1,13 +1,16 @@
 package GameOfLifeCompute.main;
 
+import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
+
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL46;
-
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
     private long windowHandle;
@@ -22,8 +25,14 @@ public class Window {
 
 
     public Window(int width, int height, String title){
-        this.width=width;
-        this.height=height;
+    	Dimension size=Toolkit.getDefaultToolkit().getScreenSize();
+    	this.width=Math.min(width,(int)size.getWidth()-5);
+    	this.height=Math.min(height, (int)size.getHeight()-32);
+    	if(width==-1){
+    		this.width=(int)size.getWidth();
+    	}if(height==-1){
+    		this.height=(int)size.getHeight()-32;
+    	}
         this.aspectRatio=(float)width/height;
         this.title=title;
         this.resized=false;
@@ -39,11 +48,7 @@ public class Window {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
-
-
-
-
-
+        
         windowHandle = glfwCreateWindow(width, height, title, NULL, NULL);
 
         if(windowHandle==NULL){
@@ -56,6 +61,8 @@ public class Window {
             this.aspectRatio=(float)width/height;
             this.setResized(true);
         });
+        
+
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(windowHandle);

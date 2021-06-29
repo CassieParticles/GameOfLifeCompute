@@ -15,14 +15,14 @@ void main(){
 
 	vec4 pixel=imageLoad(texture0,pixelCoord);
 
-	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2(-1,-1))).x;
-	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2(-1, 0))).x;
-	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2(-1, 1))).x;
-	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2( 0,-1))).x;
-	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2( 0, 1))).x;
-	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2( 1,-1))).x;
-	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2( 1, 0))).x;
-	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2( 1, 1))).x;
+	neighbors+=floor(imageLoad(texture0,ivec2(pixelCoord+ivec2(-1,-1))).x);
+	neighbors+=floor(imageLoad(texture0,ivec2(pixelCoord+ivec2(-1, 0))).x);
+	neighbors+=floor(imageLoad(texture0,ivec2(pixelCoord+ivec2(-1, 1))).x);
+	neighbors+=floor(imageLoad(texture0,ivec2(pixelCoord+ivec2( 0,-1))).x);
+	neighbors+=floor(imageLoad(texture0,ivec2(pixelCoord+ivec2( 0, 1))).x);
+	neighbors+=floor(imageLoad(texture0,ivec2(pixelCoord+ivec2( 1,-1))).x);
+	neighbors+=floor(imageLoad(texture0,ivec2(pixelCoord+ivec2( 1, 0))).x);
+	neighbors+=floor(imageLoad(texture0,ivec2(pixelCoord+ivec2( 1, 1))).x);
 		
 	
 	if(paused==0){
@@ -31,7 +31,7 @@ void main(){
 		} else if (neighbors==3){
 			imageStore(texture1, pixelCoord, vec4(1, 0, 0, 1));
 		}else {
-			imageStore(texture1, pixelCoord, vec4(0, 0, 0, 1));
+			imageStore(texture1, pixelCoord, vec4(max(0,pixel.x-0.01), 0, 0, 1));
 		}
 	}else{
 		imageStore(texture1, pixelCoord, pixel);

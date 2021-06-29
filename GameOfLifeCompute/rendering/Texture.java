@@ -96,8 +96,8 @@ public class Texture {
         return new int[] {textureId,width,height};
     }
 
-    public void writeToTexture(int x,int y, Preset gosperGun){
-        writeToTexture(x,y, gosperGun.getWidth(), gosperGun.getHeight(), gosperGun.getData());
+    public void writeToTexture(int x,int y, Preset preset){
+        writeToTexture(x,y, preset.getWidth(), preset.getHeight(), preset.getData());
     }
 
     
