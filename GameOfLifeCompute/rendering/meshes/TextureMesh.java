@@ -63,7 +63,7 @@ public class TextureMesh {
         }
     }
 
-    public void render(Program program, Texture gameTexture, Texture lastRender){
+    public void render(Program program, Texture gameTexture, Texture lastRender,float fadeRate, int paused){
         program.useProgram();
 
         GL46.glActiveTexture(GL46.GL_TEXTURE0);
@@ -79,6 +79,8 @@ public class TextureMesh {
 
         program.setUniform("gameTexture", 0);
         program.setUniform("lastRender", 1);
+        program.setUniform("fadeRate", fadeRate);
+        program.setUniform("paused", paused);
 
         GL46.glDrawElements(GL46.GL_TRIANGLES, getVertexCount(), GL46.GL_UNSIGNED_INT, 0);
 

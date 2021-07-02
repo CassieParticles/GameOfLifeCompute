@@ -36,6 +36,7 @@ public class Main {
 	private int pixelsPerSquare=4;
 	private int textureWidth;
 	private int textureHeight;
+	private float fadeRate=0.01f;
 
 	private boolean writeTexture0;
 	private boolean renderTexture0;
@@ -59,7 +60,7 @@ public class Main {
 	}
 	
 	private void init() throws Exception{
-		window=new Window(512,512,"gameing");
+		window=new Window(-1,-1,"gameing");
 		screenWidth=window.getWidth();
 		screenHeight=window.getHeight();
 		input=new Input();
@@ -137,6 +138,8 @@ public class Main {
 
 		renderProgram.createUniform("gameTexture");
 		renderProgram.createUniform("lastRender");
+		renderProgram.createUniform("fadeRate");
+		renderProgram.createUniform("paused");
 
 		computeProgram.createUniform("paused");
 		computeProgram.createUniform("texture0");
@@ -169,7 +172,7 @@ public class Main {
 		GL46.glClear(GL46.GL_COLOR_BUFFER_BIT);
 		GL46.glViewport(0, 0, textureWidth, textureHeight);
 
-		gameTexture.render(renderProgram, writeTexture0?texture0:texture1,frameBuffer.getTexture(1-renderTexture));
+		gameTexture.render(renderProgram, writeTexture0?texture0:texture1,frameBuffer.getTexture(1-renderTexture),fadeRate,paused?1:0);
 
 		frameBuffer.unbindFrameBuffer();
 
