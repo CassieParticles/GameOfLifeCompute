@@ -5,8 +5,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import GameOfLifeCompute.main.Preset;
-import org.joml.Vector2i;
-import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL46;
 import org.lwjgl.stb.STBImage;
@@ -32,7 +30,7 @@ public class Texture {
         this.format=GL46.GL_RGBA;
     }
 
-    public Texture(int width, int height,int internalFormat, int pixelFormat,int dataType){
+    public Texture(int width, int height, int internalFormat, int pixelFormat, int dataType){
         this.id= GL46.glGenTextures();
         this.width=width;
         this.height=height;
