@@ -2,13 +2,13 @@ package GameOfLifeCompute.main;
 
 public class Presets {
 
-	public Preset glider=new Preset(3,3,new float[]{
+	public static Preset glider=new Preset(3,3,new float[]{
 			0, 1, 0,
 			0, 0, 1,
 			1, 1, 1
 	});
 
-	public Preset gosperGun=new Preset(36,9,new float[]{
+	public static Preset gosperGun=new Preset(36,9,new float[]{
 			0,0,0,0,0,0,0,0,0,0 ,0,0,0,0,0,0,0,0,0,0 ,0,0,0,0,1,0,0,0,0,0 ,0,0,0,0,0,0,
 			0,0,0,0,0,0,0,0,0,0 ,0,0,0,0,0,0,0,0,0,0 ,0,0,1,0,1,0,0,0,0,0 ,0,0,0,0,0,0,
 			0,0,0,0,0,0,0,0,0,0 ,0,0,1,1,0,0,0,0,0,0 ,1,1,0,0,0,0,0,0,0,0 ,0,0,0,0,1,1,
