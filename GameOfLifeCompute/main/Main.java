@@ -4,10 +4,11 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL46;
 
 import GameOfLifeCompute.Input;
-import GameOfLifeCompute.rendering.Mesh;
 import GameOfLifeCompute.rendering.Program;
 import GameOfLifeCompute.rendering.Shader;
 import GameOfLifeCompute.rendering.Texture;
+import GameOfLifeCompute.rendering.meshes.ScreenMesh;
+import GameOfLifeCompute.rendering.meshes.TextureMesh;
 import GameOfLifeCompute.utils.FileHandling;
 import GameOfLifeCompute.utils.Timer;
 
@@ -18,21 +19,28 @@ public class Main {
 	
 	private Window window;
 	
-	private Mesh screen;
+	private TextureMesh gameTexture;
+	private ScreenMesh screen;
 
-	private Presets presets;
+	private FrameBuffer frameBuffer;
 	
 	private Program screenProgram;
+	private Program renderProgram;
 	private Program computeProgram;
 	
 	private Texture texture0;
 	private Texture texture1;
-
-	private int screenSize=1024;
+	private int screenWidth;
+	private int screenHeight;
+	
 	private int pixelsPerSquare=4;
-	private int textureSize;
+	private int textureWidth;
+	private int textureHeight;
+	private float fadeRate=0.01f;
 
+	private boolean writeTexture0;
 	private boolean renderTexture0;
+	
 	private boolean paused;
 
 	
@@ -52,41 +60,59 @@ public class Main {
 	}
 	
 	private void init() throws Exception{
-		window=new Window(screenSize,screenSize,"gameing");
+		window=new Window(-1,-1,"gameing");
+		screenWidth=window.getWidth();
+		screenHeight=window.getHeight();
 		input=new Input();
 		timer=new Timer(60,60);	//UPS,FPS
-		presets=new Presets();
+		frameBuffer=new FrameBuffer();
+
+		textureWidth=screenWidth/pixelsPerSquare;
+		textureHeight=screenHeight/pixelsPerSquare;
 		
 		window.init();
 		input.init(window);
+		frameBuffer.init(textureWidth,textureHeight);
 
-		textureSize=screenSize/pixelsPerSquare;
-		
-		texture0=new Texture(textureSize,textureSize,GL46.GL_R32F,GL46.GL_RED,GL46.GL_FLOAT);
-		texture1=new Texture(textureSize,textureSize,GL46.GL_R32F,GL46.GL_RED,GL46.GL_FLOAT);
+		texture0=new Texture(textureWidth,textureHeight,GL46.GL_R32F,GL46.GL_RED,GL46.GL_FLOAT);
+		texture1=new Texture(textureWidth,textureHeight,GL46.GL_R32F,GL46.GL_RED,GL46.GL_FLOAT);
 
-		screen=new Mesh(new float[]{
+
+		float[] vertices=new float[]{
 				-1,1,
 				1,1,
 				1,-1,
 				-1,-1
-			},new int[]{
+		};
+
+		int[] indices=new int[]{
 				0,1,2,
 				0,2,3
-			},
-			new float[]{
-					0,0,
-					1,0,
-					1,1,
-					0,1
-			},new float[]{
-					1,0,1,
-					0,1,1,
-					0,0,1,
-					0.5f,0,1
-			});
+		};
+
+		float[] textCoords=new float[]{
+				0,0,
+				1,0,
+				1,1,
+				0,1
+		};
+
+		float[] colours=new float[]{
+				1,0,1,
+				0,1,1,
+				0,0,1,
+				0.5f,0,1
+		};
+
+
+
+		//Creating the screen
+		gameTexture =new TextureMesh(vertices,indices,textCoords);
+		screen=new ScreenMesh(vertices,indices,textCoords,colours);
 		
+		//Generating shaders and programs
 		screenProgram=new Program("Screen program");
+		renderProgram=new Program("Renderbuffer program");
 		computeProgram=new Program("Compute program");
 		
 		
@@ -94,15 +120,26 @@ public class Main {
 				new Shader(FileHandling.loadResource("src/GameOfLifeCompute/rendering/screenGLSL/vertex.glsl"),GL46.GL_VERTEX_SHADER),
 				new Shader(FileHandling.loadResource("src/GameOfLifeCompute/rendering/screenGLSL/fragment.glsl"),GL46.GL_FRAGMENT_SHADER)
 		});
+
+		renderProgram.attachShaders(new Shader[]{
+				new Shader(FileHandling.loadResource("src/GameOfLifeCompute/rendering/renderGLSL/vertex.glsl"),GL46.GL_VERTEX_SHADER),
+				new Shader(FileHandling.loadResource("src/GameOfLifeCompute/rendering/renderGLSL/fragment.glsl"),GL46.GL_FRAGMENT_SHADER)
+		});
 		
 		computeProgram.attachShaders(new Shader[] {
 				new Shader(FileHandling.loadResource("src/GameOfLifeCompute/main/gameOfLife.glsl"),GL46.GL_COMPUTE_SHADER)
 		});
 		
 		screenProgram.link();
+		renderProgram.link();
 		computeProgram.link();
 		
 		screenProgram.createUniform("textureSampler");
+
+		renderProgram.createUniform("gameTexture");
+		renderProgram.createUniform("lastRender");
+		renderProgram.createUniform("fadeRate");
+		renderProgram.createUniform("paused");
 
 		computeProgram.createUniform("paused");
 		computeProgram.createUniform("texture0");
@@ -126,15 +163,36 @@ public class Main {
 	}
 	
 	private void render(){
+		int renderTexture=renderTexture0?0:1;
 		window.loop();
+
+		frameBuffer.bindFrameBuffer();
+		frameBuffer.bindTexture(renderTexture);
+
+		GL46.glClear(GL46.GL_COLOR_BUFFER_BIT);
+		GL46.glViewport(0, 0, textureWidth, textureHeight);
+
+		gameTexture.render(renderProgram, writeTexture0?texture0:texture1,frameBuffer.getTexture(1-renderTexture),fadeRate,paused?1:0);
+
+		frameBuffer.unbindFrameBuffer();
+
 		GL46.glClear(GL46.GL_COLOR_BUFFER_BIT | GL46.GL_DEPTH_BUFFER_BIT);
-		screen.render(screenProgram, new Texture[]{texture0,texture1},renderTexture0?0:1);
+
+		GL46.glViewport(0, 0, window.getWidth(), window.getHeight());
+		
+		screen.render(screenProgram,frameBuffer.getTexture(writeTexture0?0:1));
+		
+		renderTexture0=!renderTexture0;
 	}
 	
 	private void update(){
-		input();
+		if(input.isKeyDown(GLFW.GLFW_KEY_ESCAPE)){
+    		window.close();
+    	}
 		
-		Texture writeTexture=renderTexture0?texture0:texture1;
+		//Pointers to read-write textures
+		Texture readTexture=writeTexture0?texture1:texture0;
+		Texture writeTexture=writeTexture0?texture0:texture1;
 		
 		computeProgram.useProgram();
 		
@@ -142,39 +200,49 @@ public class Main {
 		computeProgram.setUniform("texture0", 0);
 		computeProgram.setUniform("texture1", 1);
 		
-		GL46.glBindImageTexture(0, renderTexture0?texture1.getId():texture0.getId(), 0, false, 0, GL46.GL_READ_ONLY, GL46.GL_R32F);
-		GL46.glBindImageTexture(1, renderTexture0?texture0.getId():texture1.getId(), 0, false, 0, GL46.GL_WRITE_ONLY, GL46.GL_R32F);
+		//Binding textures
+		GL46.glBindImageTexture(0, readTexture.getId(), 0, false, 0, GL46.GL_READ_ONLY, GL46.GL_R32F);
+		GL46.glBindImageTexture(1, writeTexture.getId(), 0, false, 0, GL46.GL_WRITE_ONLY, GL46.GL_R32F);
 		
-		GL46.glDispatchCompute(textureSize,textureSize,1);
+		//Running compute shader
+		GL46.glDispatchCompute(textureWidth,textureHeight,1);
 		
+		//Waits until all accesses to a texture are done to continue
 		GL46.glMemoryBarrier(GL46.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 		
+		//Unbinding textures
 		GL46.glBindImageTexture(0, 0, 0, false, 0, GL46.GL_READ_ONLY, GL46.GL_R32F);
 		GL46.glBindImageTexture(1, 0, 0, false, 0, GL46.GL_WRITE_ONLY, GL46.GL_R32F);
 		
 		computeProgram.unlinkProgram();
 		
+		int[] mousePos=input.getMousePos();
+		mousePos[0]/=pixelsPerSquare;
+		mousePos[1]/=pixelsPerSquare;
+		
+		//User inputs to draw on
 		if(input.isMouseButtonDown(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
-			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare),1,1,new float[]{1});
+			writeTexture.writeToTexture(mousePos[0], (mousePos[1]),1,1,new float[]{1});
 		}else if(input.isMouseButtonDown(GLFW.GLFW_MOUSE_BUTTON_RIGHT)) {
-			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare),1,1,new float[]{0});
+			writeTexture.writeToTexture(mousePos[0], (mousePos[1]),1,1,new float[]{0});
 		}else if(input.isKeyPressed(GLFW.GLFW_KEY_1)){
-			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare), presets.glider);
+			writeTexture.writeToTexture(mousePos[0], (mousePos[1]), Presets.glider);
 		}else if(input.isKeyPressed(GLFW.GLFW_KEY_2)){
-			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare), presets.gosperGun);
+			writeTexture.writeToTexture(mousePos[0], (mousePos[1]), Presets.gosperGun);
 		}else if(input.isKeyPressed(GLFW.GLFW_KEY_3)){
-			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare), Presets.Pentadecathlon);
+			writeTexture.writeToTexture(mousePos[0], (mousePos[1]), Presets.Pentadecathlon);
 		}else if(input.isKeyPressed(GLFW.GLFW_KEY_4)){
-			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare), Presets.RPentomino);
+			writeTexture.writeToTexture(mousePos[0], (mousePos[1]), Presets.RPentomino);
 		}else if(input.isKeyPressed(GLFW.GLFW_KEY_5)){
-			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare), Presets.DieHard);
+			writeTexture.writeToTexture(mousePos[0], (mousePos[1]), Presets.DieHard);
 		}else if(input.isKeyPressed(GLFW.GLFW_KEY_6)){
-			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare), Presets.Acorn);
+			writeTexture.writeToTexture(mousePos[0], (mousePos[1]), Presets.Acorn);
 		}else if(input.isKeyPressed(GLFW.GLFW_KEY_7)){
-			writeTexture.writeToTexture(input.getMousePos()[0]/pixelsPerSquare, (input.getMousePos()[1]/pixelsPerSquare), Presets.Infinite);
+			writeTexture.writeToTexture(mousePos[0], (mousePos[1]), Presets.Infinite);
 		}
 
-		renderTexture0=!renderTexture0;
+		writeTexture0=!writeTexture0;
+		
 		if(input.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
 			paused=!paused;
 		}
@@ -182,18 +250,16 @@ public class Main {
 		input.updateInputs();
 	}
 	
-	private void input(){
-		if(input.isKeyDown(GLFW.GLFW_KEY_ESCAPE)){
-    		window.close();
-    	}
-	}
-	
 	private void cleanup(){
+		gameTexture.cleanup();
 		screen.cleanup();
 		window.cleanup();
 		
 		screenProgram.cleanup();
+		renderProgram.cleanup();
 		computeProgram.cleanup();
+
+		frameBuffer.cleanup();
 		
 		texture0.cleanup();
 		texture1.cleanup();

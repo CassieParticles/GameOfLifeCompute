@@ -23,8 +23,9 @@ void main(){
 	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2( 1,-1))).x;
 	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2( 1, 0))).x;
 	neighbors+=imageLoad(texture0,ivec2(pixelCoord+ivec2( 1, 1))).x;
-		
-	
+
+
+
 	if(paused==0){
 		if (neighbors==2){
 			imageStore(texture1, pixelCoord, pixel);

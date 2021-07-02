@@ -9,5 +9,5 @@ out vec4 fragColour;
 
 void main() {
 	float enabled=texture(textureSampler,textureCoords).x;
-	fragColour=vec4(outColour*max(0.3,enabled),1);
+	fragColour=vec4(max(0.3,enabled)*outColour,1);
 }

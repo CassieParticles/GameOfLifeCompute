@@ -30,7 +30,7 @@ public class Texture {
         this.format=GL46.GL_RGBA;
     }
 
-    public Texture(int width, int height,int internalFormat, int pixelFormat,int dataType){
+    public Texture(int width, int height, int internalFormat, int pixelFormat, int dataType){
         this.id= GL46.glGenTextures();
         this.width=width;
         this.height=height;
@@ -96,8 +96,8 @@ public class Texture {
         return new int[] {textureId,width,height};
     }
 
-    public void writeToTexture(int x,int y, Preset gosperGun){
-        writeToTexture(x,y, gosperGun.getWidth(), gosperGun.getHeight(), gosperGun.getData());
+    public void writeToTexture(int x,int y, Preset preset){
+        writeToTexture(x,y, preset.getWidth(), preset.getHeight(), preset.getData());
     }
 
     
