@@ -239,6 +239,8 @@ public class Main {
 			writeTexture.writeToTexture(mousePos[0], (mousePos[1]), Presets.Acorn);
 		}else if(input.isKeyPressed(GLFW.GLFW_KEY_7)){
 			writeTexture.writeToTexture(mousePos[0], (mousePos[1]), Presets.Infinite);
+		}else if(input.isKeyPressed(GLFW.GLFW_KEY_DELETE)){
+			writeTexture.writeToTexture(0,0,Presets.genEmptyScreen(textureWidth,textureHeight));
 		}
 
 		writeTexture0=!writeTexture0;

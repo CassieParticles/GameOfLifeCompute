@@ -2,6 +2,11 @@ package GameOfLifeCompute.main;
 
 public class Presets {
 
+	public static Preset genEmptyScreen(int width, int height){
+		float[] values=new float[width*height];
+		return new Preset(width,height,values);
+	}
+
 	public static Preset glider=new Preset(3,3,new float[]{
 			0, 1, 0,
 			0, 0, 1,
